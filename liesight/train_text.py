@@ -22,19 +22,20 @@ def main():
     df_train = load_liar_dataset("train")
     df_val = load_liar_dataset("valid")
 
-    tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
+    tokenizer = RobertaTokenizer.from_pretrained("roberta-large")
     train_dataset = tokenize_data(tokenizer, df_train["statement"].tolist(), df_train["label"].tolist())
     val_dataset = tokenize_data(tokenizer, df_val["statement"].tolist(), df_val["label"].tolist())
 
-    model = RobertaForSequenceClassification.from_pretrained("roberta-base", num_labels=2)
+    model = RobertaForSequenceClassification.from_pretrained("roberta-large", num_labels=2)
 
     training_args = TrainingArguments(
-        output_dir="./models/roberta-text",
+        output_dir="./models/roberta-large",
+        learning_rate=2e-5,
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
+        num_train_epochs=4,
         eval_strategy="epoch",
         save_strategy="epoch",
-        per_device_train_batch_size=32,
-        per_device_eval_batch_size=32,
-        num_train_epochs=10,
         logging_dir="./logs",
         logging_steps=50,
         load_best_model_at_end=True,
@@ -52,7 +53,7 @@ def main():
     print("Starting training...")
     trainer.train()
     print("Saving model...")
-    trainer.save_model("./models/roberta-text")
+    trainer.save_model("./models/roberta-large")
 
 if __name__ == "__main__":
     main()
